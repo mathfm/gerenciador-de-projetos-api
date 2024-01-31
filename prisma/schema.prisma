@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum TaskPriority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+enum TaskProgress {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+}
+
+enum ProjectPriority {
+  LOW 
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum CollaboratorRole {
+  DEVELOPER
+  DESIGNER
+  PROJECT_MANAGER
+  QA_TESTER
+}
+
+enum TeamRole {
+  TEAM_LEAD
+  TEAM_MEMBER
+}
+
+enum StatusCollaborator {
+  INACTIVE
+  ACTIVE
+  SUSPENSE
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  username String @db.VarChar(60)
+  email String @unique @db.VarChar(120)
+  password String
+  project_creator Project[]
+  collaborator Collaborator?
+}
+
+model Project {
+  id Int @id @default(autoincrement())
+  name_project String @db.VarChar(200)
+  description String @db.Text
+  date_created DateTime @default(now())
+  user_creator User []
+  project_priority ProjectPriority
+  user_id_creator Int?
+  collaborators Collaborator[]
+  task Task[]
+}
+
+model Collaborator {
+  id Int @id @default(autoincrement())
+  integration_date DateTime @default(now())
+  function_project CollaboratorRole
+  status_collaborator StatusCollaborator
+  project Project @relation(fields: [project_id], references: [id])
+  project_id Int
+  user User @relation(fields: [user_id], references: [id])
+  user_id Int @unique
+  task Task? @relation(fields: [task_id], references: [id])
+  task_id Int? 
+  
+
+}
+
+model Task {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())  
+  description_task String @db.Text
+  deadline DateTime
+  collaborator Collaborator[]
+  collaborator_id Int?
+  project Project @relation(fields: [project_id], references: [id])
+  project_id Int
+  priority TaskPriority
+  status_task TaskProgress
+}
