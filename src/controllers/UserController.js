@@ -4,22 +4,28 @@ class UserController {
     async create(req, res) {
         try {
             const { username, email, password } = req.body;
-            const resultado = await UserRepository.createUser(username, email, password);
-            res.send(resultado).status(200);
+            if (username && email && (password.lenght >= 8)) {
+                const resultado = await UserRepository.createUser(username, email, password);
+                res.status(201).send(resultado);                
+            }
+            else 
+                throw new Error(`Um dos campos esta em branco ou a senha não atinge o minimo de 8 caracteres.`)
         } catch (e) {
-            res.status(400).send(`Erro ao criar o usuario error: ${e.message}`);
+            res.status(422).send(e.message);
         }
     }
 
     async update(req, res) {
         try {
-            const { email, password } = req.body;
-            const id = parseInt(req.params.id);
-            const resultadoConslta = await UserRepository.updateUser(email, password, id);
-            res.send(resultadoConslta).status(200);
-
+            if (email && (password.lenght >= 8)) {
+                const { email, password } = req.body;
+                const id = parseInt(req.params.id);
+                const resultadoConslta = await UserRepository.updateUser(email, password, id);
+                res.status(201).send(resultadoConslta);                
+            }
+            else throw new Error('Nâo foi possivel atualizar os dados')
         } catch (e) {
-            res.status(400).send(`Erro ao atualizar o usuario error: ${e.message}`);
+            res.status(422).send(e.message);
         }
     }
 
@@ -29,15 +35,28 @@ class UserController {
     }
 
     async getById(req, res) {
-        const id = parseInt(req.params.id);
-        const consulta = await UserRepository.getUserId(id);
-        res.send(consulta).status(200);
+        try {
+            const id = parseInt(req.params.id);
+            const consulta = await UserRepository.getUserId(id);
+            if (consulta)
+                res.status(200).send(consulta);
+            else
+                res.status(404).send('Usuario não encontrado.');
+        } catch (e) {
+            res.send(e.message).status(404);
+        }
     }
 
     async deleteUser(req, res) { 
-        const id = parseInt(req.params.id2);
-        const consulta = await UserRepository.deleteUser(id);
-        res.send(consulta).status(200);
+        try {
+            const id = parseInt(req.params.id);
+            const consulta = await UserRepository.deleteUser(id);
+            if (consulta) 
+                res.status(200).send(200);    
+            else throw new Error('O id não foi encontrado')   
+        } catch (e) {
+            res.send(e.message).status(400);
+        }
     }
 }
 
