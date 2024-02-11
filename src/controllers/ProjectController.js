@@ -5,8 +5,15 @@ class ProjectController {
         try {
             const user_id = parseInt(req.params.id);
             const { name_project, description_project, project_priority } = req.body;
-            const resultado = await ProjectRepository.createProject(user_id, name_project, description_project, project_priority);
-            res.send(resultado).status(200);            
+            
+            if (name_project && description_project && project_priority) {
+               const resultado = await ProjectRepository.createProject(user_id, name_project, description_project, project_priority);
+                res.send(resultado).status(200);      
+            }
+            else {
+                res.send('Preencha todos os campos').status(400);
+            }
+                   
         } catch (e) {
             res.send(`erro na criação do projejo ${e.message}`).status(404);
         }
@@ -17,8 +24,14 @@ class ProjectController {
         try {
             const id_project = parseInt(req.params.id2);
             const { name_project, description_project, project_priority } = req.body;
-            const resultado = await ProjectRepository.updateProject(id_project, name_project, description_project, project_priority);
-            res.send(resultado).status(200);
+            if (name_project && description_project && project_priority) {
+                const resultado = await ProjectRepository.updateProject(id_project, name_project, description_project, project_priority);
+                res.send(resultado).status(200);
+            }
+            else {
+                res.send('Preencha todos os campos').status(400);
+            }
+            
         } catch (e) {
             res.send(`Erro na atualização do projeto ${e.message}`).status(404);
         }

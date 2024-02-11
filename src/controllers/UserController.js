@@ -4,7 +4,7 @@ class UserController {
     async create(req, res) {
         try {
             const { username, email, password } = req.body;
-            if (username && email && (password.lenght >= 8)) {
+            if (username && email && (password.length  >= 8)) {
                 const resultado = await UserRepository.createUser(username, email, password);
                 res.status(201).send(resultado);                
             }
